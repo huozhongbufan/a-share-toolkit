@@ -1,0 +1,142 @@
+{
+  "_readme": "改这个文件就够了。fees 那一段必须先填对，否则算出来的盈亏平衡点是错的。",
+  "account": {
+    "total_capital": 500.0,
+    "cash": 500.0,
+    "note": "本金 500 元，专款专用"
+  },
+  "fees": {
+    "_note": "去你的券商 App 查『佣金费率』。ETF/场内基金通常免印花税。min_commission 填 0 表示该券商『免五』—— 这是 ¥500 本金下最重要的一个数字。",
+    "commission_rate": 0.00025,
+    "min_commission": 5.0,
+    "stamp_duty_rate": 0.0,
+    "transfer_fee_rate": 0.0,
+    "slippage_bps": 2.0
+  },
+  "risk": {
+    "_note": "硬闸门。命中任意一条就拒绝出单，AI 复核无权覆盖。注意 max_position_pct 在 500 元本金下几乎不起保护作用（1 手就是最小单位，粒度太粗），它主要是『留点现金』的意思。真正干活的是费用占比、交易频次和熔断三条。",
+    "max_position_pct": 0.95,
+    "max_total_exposure_pct": 0.98,
+    "daily_stop_loss_pct": -0.02,
+    "max_drawdown_pct": -0.12,
+    "max_trades_per_month": 4,
+    "max_fee_ratio_per_trade": 0.006,
+    "min_edge_multiple": 3.0,
+    "stop_loss_atr": 2.0,
+    "take_profit_atr": 3.0,
+    "cooldown_days_after_stop": 3,
+    "max_required_win_rate": 0.55
+  },
+  "universe": {
+    "_note": "max_lot_cost 会自动按本金算：能买得起 1 手(100份)才进池子。",
+    "auto_max_lot_cost": true,
+    "cash_buffer_pct": 0.02,
+    "min_avg_turnover_wan": 3000,
+    "min_listed_days": 60,
+    "exclude_keywords": [
+      "杠杆",
+      "分级",
+      "两倍",
+      "三倍",
+      "反向",
+      "做空",
+      "货币",
+      "日利",
+      "添益",
+      "国债",
+      "债券",
+      "短融",
+      "城投",
+      "信用债",
+      "REIT",
+      "原油",
+      "商品"
+    ],
+    "only_t0": false,
+    "manual_whitelist": [],
+    "manual_blacklist": []
+  },
+  "strategy": {
+    "ma_fast": 20,
+    "ma_slow": 60,
+    "mom_window": 20,
+    "pct_window": 250,
+    "max_price_percentile": 0.75,
+    "min_atr_pct": 0.008,
+    "max_atr_pct": 0.06,
+    "top_n": 3,
+    "exit_confirm_days": 2
+  },
+  "ai": {
+    "_note": "分工：规则筛数字（第0层）→ 本地小模型筛文本（第1层）→ API 大模型独立复核（第2层）→ 人决定（第3层）。AI 只能否决，不能加仓。",
+    "enabled": true,
+    "reviewers": [
+      {
+        "id": "deepseek",
+        "kind": "http",
+        "base_url": "https://api.deepseek.com/v1",
+        "model": "deepseek-flash",
+        "key_from": "<your-key-file>",
+        "timeout": 240,
+        "cost_cny_per_call": 0.002,
+        "_role": "独立复核员。直连 DeepSeek API，单次约 ¥0.002（实测 1119 tokens）。擅长抓费用结构和算术不一致"
+      },
+      {
+        "id": "kimi",
+        "kind": "http",
+        "base_url": "https://api.moonshot.cn/v1",
+        "model": "kimi-k3",
+        "max_tokens": 8000,
+        "key_from": "<your-key-file>",
+        "temperature": 1.0,
+        "timeout": 300,
+        "cost_cny_per_call": 0.02,
+        "_role": "独立复核员。直连 Moonshot API。kimi-k3 只接受 temperature=1，配错了直接 400。算赔率和净盈亏最细"
+      },
+      {
+        "id": "claude",
+        "kind": "claude",
+        "cmd": "claude",
+        "timeout": 300,
+        "cost_cny_per_call": 1.29,
+        "_role": "独立复核员。按次计费 ¥1.29（实测），推理最深。只在交易金额够大时才叫它",
+        "key_from": "<your-key-file>",
+        "base_url": ""
+      }
+    ],
+    "budget": {
+      "_note": "API 花费管控。真正花钱的只有 claude。max_cost_ratio_of_trade 是关键：复核成本必须和这笔交易成比例，否则不值得。0.002 = 最多花交易金额的 0.2%。",
+      "enabled": true,
+      "daily_limit_cny": 2.0,
+      "monthly_limit_cny": 30.0,
+      "max_cost_ratio_of_trade": 0.002
+    },
+    "prefilter": {
+      "_note": "第 1 层：本地小模型，零成本、数据不出本机，只负责「从同花顺代码表里检索标的」，不参与任何交易决策。按顺序降级：第一个失败才试第二个。r1 排第一是因为实测它对「红利 低波动」这类查询挑得更准（会选红利低波系列），代价是 9.4s vs qwen 的 4.1s。它不参与决策 —— 曾经让它当复核员，它给出「把止损放宽到 8-10%」这种在 500 元本金下会加大亏损的建议。",
+      "enabled": true,
+      "models": [
+        {
+          "id": "r1",
+          "kind": "ollama",
+          "model": "deepseek-r1:8b"
+        },
+        {
+          "id": "qwen",
+          "kind": "ollama",
+          "model": "qwen2.5:7b"
+        },
+        {
+          "id": "glm",
+          "kind": "ollama",
+          "model": "glm4:9b"
+        }
+      ]
+    },
+    "min_approvals": 1,
+    "veto_confidence": 0.8
+  },
+  "paths": {
+    "data_dir": "data",
+    "out_dir": "out"
+  }
+}

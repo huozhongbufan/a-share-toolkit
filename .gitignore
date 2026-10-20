@@ -1,0 +1,8 @@
+﻿# data/ 与 out/ 是运行产物，不进仓库
+data/
+out/
+*.jsonl
+config.json
+__pycache__/
+*.pyc
+.venv/

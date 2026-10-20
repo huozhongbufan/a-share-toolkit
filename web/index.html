@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0f13">
+  <title>ETF 工作台</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">ETF</div>
+      <h1>ETF 工作台</h1>
+      <span id="fresh" class="pill level-dim">加载中…</span>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <div id="errorbar" class="errorbar hidden"></div>
+
+    <section class="paths">
+      <article class="card path path-a">
+        <h2>路 A · 长期定投</h2>
+        <div id="plan" class="dim">加载中…</div>
+      </article>
+      <article class="card path path-b">
+        <h2>路 B · 训练</h2>
+        <div id="train-summary" class="dim">加载中…</div>
+      </article>
+    </section>
+
+    <section class="card">
+      <h2>账户</h2>
+      <div id="account" class="grid4 dim">加载中…</div>
+    </section>
+
+    <section class="card">
+      <h2>待办</h2>
+      <div id="todos" class="dim">加载中…</div>
+    </section>
+
+    <section class="card">
+      <h2>花费</h2>
+      <div id="spend" class="dim">加载中…</div>
+    </section>
+
+    <section class="card">
+      <h2>查询</h2>
+      <input id="q" type="text" placeholder="如：农业银行现在多少钱 / 防守型" autocomplete="off">
+      <div class="btnrow">
+        <button id="btn-ask" disabled>问行情</button>
+        <button id="btn-find" disabled>找标的</button>
+      </div>
+      <div id="query-out" class="out"></div>
+    </section>
+
+    <section class="card">
+      <h2>动作</h2>
+      <div class="btnrow">
+        <button id="btn-train" class="primary">跑训练</button>
+        <button id="btn-look">读自选股</button>
+      </div>
+      <div id="train-out" class="out"></div>
+      <div id="look-out" class="out"></div>
+    </section>
+
+    <footer>
+      <span id="updated">更新于 —</span>
+      <span id="model-status">模型：加载中…</span>
+    </footer>
+
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
