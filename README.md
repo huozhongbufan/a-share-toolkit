@@ -6,6 +6,10 @@
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)]()
 [![No auto-trading](https://img.shields.io/badge/auto--trading-never-red.svg)](#what-it-does-not-do)
 
+![工作台](docs/workbench.png)
+
+*真实运行的界面：指数条走公开行情接口，账户数字来自只追加流水账。*
+
 小资金、半自动、纪律优先的 A 股工具链。**零第三方依赖**（纯标准库）。
 
 > A zero-dependency A-share toolkit for small accounts.
