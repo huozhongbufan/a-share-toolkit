@@ -192,6 +192,51 @@
     $('updated').textContent = '更新于 ' + (d.at || '—');
   }
 
+  /* ---------- 指数 / 涨跌家数 ---------- */
+
+  function renderIndices(d) {
+    var list = d.indices || [];
+    if (!list.length) {
+      setOut('indexbar', '<span class="dim">指数暂无数据</span>');
+      return;
+    }
+    var items = list.map(function (it) {
+      var pct = (it.pct === null || it.pct === undefined) ? null : Number(it.pct);
+      var cls = (pct === null || pct === 0) ? 'dim' : (pct > 0 ? 'up' : 'down');
+      var sign = pct > 0 ? '+' : '';
+      var price = (it.price === null || it.price === undefined)
+        ? '—' : Number(it.price).toFixed(2);
+      return '<span class="idx">'
+        + '<span class="idx-name">' + esc(it.name) + '</span>'
+        + '<span class="idx-price">' + price + '</span>'
+        + '<span class="idx-pct ' + cls + '">'
+        + (pct === null ? '—' : sign + pct.toFixed(2) + '%')
+        + '</span></span>';
+    }).join('');
+    setOut('indexbar', items + '<span id="breadth" class="breadth dim"></span>');
+    loadBreadth();
+  }
+
+  function loadBreadth() {
+    get('/api/breadth').then(function (d) {
+      var el = $('breadth');
+      if (!el) return;
+      var up = d.up, down = d.down, flat = d.flat;
+      if (up === null || up === undefined) { el.textContent = ''; return; }
+      var total = (up || 0) + (down || 0) + (flat || 0);
+      var w = total ? Math.round((up || 0) / total * 100) : 0;
+      el.innerHTML = '<span class="up">↑' + up + '</span>'
+        + '<span class="vbar"><i style="width:' + w + '%"></i></span>'
+        + '<span class="down">↓' + down + '</span>';
+    }).catch(function () {});
+  }
+
+  function loadIndices() {
+    get('/api/indices').then(renderIndices).catch(function (e) {
+      setOutErr('indexbar', '指数接口失败：' + e.message);
+    });
+  }
+
   function loadOverview() {
     get('/api/overview').then(renderOverview).catch(function (e) {
       showError('总览接口失败：' + e.message);
@@ -468,9 +513,13 @@
     $('btn-look').addEventListener('click', look);
 
     loadOverview();
+    loadIndices();
     loadTodos();
     loadWarm();
-    overviewTimer = setInterval(loadOverview, 60000);
+    overviewTimer = setInterval(function () {
+      loadOverview();
+      loadIndices();
+    }, 60000);
   }
 
   document.addEventListener('DOMContentLoaded', init);
