@@ -1,5 +1,37 @@
 # a-share-toolkit
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776ab.svg)](https://www.python.org/)
+[![Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)]()
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)]()
+[![No auto-trading](https://img.shields.io/badge/auto--trading-never-red.svg)](#what-it-does-not-do)
+
+小资金、半自动、纪律优先的 A 股工具链。**零第三方依赖**（纯标准库）。
+
+> A zero-dependency A-share toolkit for small accounts.
+>
+> The enemy of a small account is not stock picking — it is **friction**.
+> With a ¥5 minimum commission, a ¥1,000 round trip loses ~1% before the price
+> even moves. This repo encodes that arithmetic as a **hard gate**: orders that
+> cannot clear it are refused, with the exact shortfall printed.
+>
+> Three rules, enforced in code: **degrade but never fabricate**, **append only,
+> never rewrite**, and **abstention is not consent** (an AI that times out or is
+> skipped by the budget gate never counts as approval).
+>
+> ```bash
+> git clone https://github.com/huozhongbufan/a-share-toolkit
+> cd a-share-toolkit
+> cp config.example.json config.json     # edit fees / limits
+> python run.py status                   # account state from the ledger
+> python run.py dip                      # scan for oversold opportunities
+> python run.py serve                    # local web workbench
+> ```
+>
+> **No auto-trading.** The last mile is a human keypress — by design, not by omission.
+
+---
+
 一套**小资金、半自动、自用**的 A 股工具链，纯 Python 标准库（零第三方依赖）。
 不是荐股工具，也不是自动交易机器人——核心是**用纪律替代盯盘**。
 
