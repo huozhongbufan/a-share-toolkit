@@ -271,3 +271,43 @@ footer {
   font-size: 12px;
   margin-top: 2px;
 }
+
+/* ── 指数条 + 涨跌家数（A股：红涨绿跌）──────────────────────────── */
+.indexbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  background: var(--panel, #151920);
+  border: 1px solid var(--line, #232935);
+  border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.idx { display: inline-flex; align-items: baseline; gap: 7px; }
+.idx-name { color: var(--dim, #8b93a3); font-size: 13px; }
+.idx-price { font-size: 16px; font-weight: 600; }
+.idx-pct { font-size: 13px; font-weight: 600; }
+.breadth {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.vbar {
+  display: inline-block;
+  width: 90px;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #1e2531;
+  position: relative;
+}
+.vbar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%);
+  border-radius: 4px 0 0 4px;
+}
